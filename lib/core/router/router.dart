@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:home_rental_application/views/auth/login_screen.dart';
-import 'package:home_rental_application/views/onboarding/onbaording_screen.dart';
+import 'package:home_rental_application/views/onboarding/onboarding_screen.dart';
 
 import '../../views/splash/splash_screen.dart';
 

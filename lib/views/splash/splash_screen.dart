@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
 
       if (isFirstTime){
-        await StorageService.setFirstTimeUser(false);
+        // await StorageService.setFirstTimeUser(false);
 
         if(!mounted) return;
 
