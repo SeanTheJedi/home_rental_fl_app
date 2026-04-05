@@ -10,7 +10,11 @@ class AuthController extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   // simulate firebase login
-  Future<User ?> loginWithRole(String email, String password, UserRole expectedRole) async {
+  Future<User ?> loginWithRole(
+      String email,
+      String password,
+      UserRole expectedRole
+      ) async {
     _isLoading = true;
     notifyListeners();
 
