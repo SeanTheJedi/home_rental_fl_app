@@ -8,40 +8,47 @@ import '../../core/common/widgets/custom_button.dart';
 import '../../core/common/widgets/custom_textfield.dart';
 import '../../core/constants/color_constants.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _authController = AuthController();
+class _RegisterScreenState extends State<RegisterScreen> {
+  // 1. State Variables & Controllers Setup (From 1:03 - 2:05)
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  final _authController = AuthController();
   UserRole _selectedRole = UserRole.tenant;
 
-  Future<void> _handleLogin() async{
+  // 2. Registration Logic
+  Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
+
       try {
-        final user = await _authController.loginWithRole(
-            _emailController.text,
-            _passwordController.text,
-            _selectedRole,
+        final user = await _authController.register(
+          fullName: _fullNameController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
+          role: _selectedRole,
         );
 
-        if ( mounted && user != null) {
+        if (mounted && user != null) {
           context.go(user.role == UserRole.landlord
-            ? '/landlord/dashboard'
-            : '/home'
-          );
+              ? '/landlord/dashboard'
+              : '/home');
         }
       } catch (e) {
         if (mounted) {
@@ -56,14 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         }
       }
-
     }
-
-
   }
 
-
-  @override
+  // 3. Building the Visual Tree (From 2:05 - 13:23)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,26 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   SizedBox(height: 60.h),
 
-                  // App Logo/Icon
-                  Center(
-                    child: Container(
-                      padding: EdgeInsets.all(16.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.home_rounded,
-                        color: AppColors.primary,
-                        size: 48.sp,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 32.h),
-
-                  // Welcome Text
+                  // Header Texts
                   Text(
-                    'Welcome Back!',
+                    'Create Account',
                     style: TextStyle(
                       fontSize: 28.sp,
                       fontWeight: FontWeight.bold,
@@ -107,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'Sign in to continue',
+                    'Sign up to get started',
                     style: TextStyle(
                       fontSize: 16.sp,
                       color: AppColors.textSecondary,
@@ -115,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 32.h),
 
-                  // Role Selection Tabs (Tenant / Landlord)
+                  // Role Selection Row
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.surface,
@@ -133,6 +119,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 24.h),
+
+                  // Full Name Field
+                  CustomTextField(
+                    label: 'Full Name',
+                    controller: _fullNameController,
+                    prefixIcon: Icons.person_outline,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your full name';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16.h),
 
                   // Email Field
                   CustomTextField(
@@ -157,7 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscurePassword,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Please enter a password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
                       }
                       return null;
                     },
@@ -177,46 +180,63 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 16.h),
 
-                  // Forgot Password Button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  // Confirm Password Field
+                  CustomTextField(
+                    label: 'Confirm Password',
+                    controller: _confirmPasswordController,
+                    prefixIcon: Icons.lock_outline,
+                    obscureText: _obscureConfirmPassword,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
                   SizedBox(height: 32.h),
 
-                  // Sign In Button
+                  // Sign Up Execution Button
                   CustomButton(
-                    text: 'Sign In',
+                    text: 'Sign Up',
                     isLoading: _isLoading,
-                    onPressed: _handleLogin,
+                    onPressed: _handleRegister,
                   ),
                   SizedBox(height: 24.h),
 
-                  // Sign Up Navigation
+                  // Route back to Login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account?",
+                        "Already have an account?",
                         style: TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 14.sp,
                         ),
                       ),
                       TextButton(
-                        onPressed: () => context.push('/register'),
+                        onPressed: () {
+                          // Routes back to the Login screen
+                          context.pop();
+                        },
                         child: Text(
-                          'Sign Up',
+                          'Sign In',
                           style: TextStyle(
                             color: AppColors.primary,
                             fontSize: 14.sp,
@@ -226,6 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 24.h),
                 ],
               ),
             ),
@@ -235,12 +256,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // Helper widget identical to the one in LoginScreen
   Widget _buildRoleTab(UserRole role, String title) {
     final isSelected = _selectedRole == role;
 
     return GestureDetector(
       onTap: () {
-        // Update the UI when tapped
         setState(() {
           _selectedRole = role;
         });
@@ -250,7 +271,6 @@ class _LoginScreenState extends State<LoginScreen> {
         curve: Curves.easeInOut,
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          // Fill with primary blue if selected, otherwise transparent
           color: isSelected ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(12.r),
         ),
@@ -258,7 +278,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text(
             title,
             style: TextStyle(
-              // White text if selected, grey text if not
               color: isSelected ? Colors.white : AppColors.textSecondary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               fontSize: 14.sp,

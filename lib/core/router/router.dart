@@ -8,6 +8,7 @@ import 'package:home_rental_application/views/landlord/landlord_dashboard/landlo
 import 'package:home_rental_application/views/onboarding/onboarding_screen.dart';
 import 'package:home_rental_application/views/profile/profile_screen.dart';
 
+import '../../views/auth/register_screen.dart';
 import '../../views/landlord/landlord_bookings/landlord_booking_screen.dart';
 import '../../views/landlord/landlord_profile/landlord_profile_screen.dart';
 import '../../views/landlord/landlord_properties/landlord_properties.dart';
@@ -33,6 +34,11 @@ final router = GoRouter(
           name: 'auth',
           builder: (context, state) => const LoginScreen(),
       ),
+    GoRoute(
+      path: '/register',
+      name: 'register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
     ShellRoute(
         builder: (context, state, child) => MainLayout(
           location: state.uri.toString(),
