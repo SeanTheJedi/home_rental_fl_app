@@ -81,7 +81,7 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  Future<void> _resetPassword(String email) async {
+  Future<void> resetPassword(String email) async {
     _isLoading = true;
     notifyListeners();
 

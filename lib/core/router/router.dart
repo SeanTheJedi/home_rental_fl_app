@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:home_rental_application/views/auth/forgot_password_screen.dart';
 import 'package:home_rental_application/views/auth/login_screen.dart';
 import 'package:home_rental_application/views/booking/bookings_list/bookings_list_screen.dart';
 import 'package:home_rental_application/views/chat/messages_screen.dart';
@@ -38,6 +39,11 @@ final router = GoRouter(
       path: '/register',
       name: 'register',
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      name: 'forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
     ),
     ShellRoute(
         builder: (context, state, child) => MainLayout(
