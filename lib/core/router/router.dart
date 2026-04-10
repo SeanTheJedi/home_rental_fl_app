@@ -65,7 +65,7 @@ final router = GoRouter(
           ), // GoRoute
           GoRoute(
               path: '/messages',
-              builder: (context, state) => const MessagesScreen()
+              builder: (context, state) => const MessagesScreen(isLandlord: false, userId: '1',)
           ), // GoRoute
           GoRoute(
               path: '/profile',
@@ -96,7 +96,7 @@ final router = GoRouter(
           ),
           GoRoute(
               path: '/landlord/messages',
-              builder: (context, state) => const MessagesScreen()
+              builder: (context, state) => const MessagesScreen(isLandlord: true, userId: '2',)
           ),
           GoRoute(
               path: '/landlord/profile',
