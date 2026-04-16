@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "260403408119",
+    "project_id": "homerent-31c13",
+    "storage_bucket": "homerent-31c13.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:260403408119:android:e51916450bd50fac0eb7f2",
+        "android_client_info": {
+          "package_name": "com.example.home_rental_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH1937qnIwuZW3TDYcXo9gtX6kt10tYC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
