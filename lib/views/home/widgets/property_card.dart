@@ -5,7 +5,6 @@ import 'package:shimmer/shimmer.dart';
 import '../../../core/constants/color_constants.dart';
 import '../../../models/property_model.dart';
 
-
 class PropertyCard extends StatelessWidget {
   final Property property;
   final VoidCallback onTap;
@@ -36,15 +35,18 @@ class PropertyCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // The Top Image
-            ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-              child: CachedNetworkImage(
-                imageUrl: property.imageUrl,
-                height: 120.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => _buildShimmerEffect(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+            Hero(
+              tag: 'property-image-${property.id}',
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+                child: CachedNetworkImage(
+                  imageUrl: property.imageUrl,
+                  height: 120.h,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => _buildShimmerEffect(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
               ),
             ),
 

@@ -5,11 +5,13 @@ import 'package:home_rental_application/views/booking/bookings_list/bookings_lis
 import 'package:home_rental_application/views/chat/messages_screen.dart';
 import 'package:home_rental_application/views/favorite/favorites_screen.dart';
 import 'package:home_rental_application/views/home/home_screen.dart';
+import 'package:home_rental_application/views/home/property_details_screen.dart';
 import 'package:home_rental_application/views/landlord/landlord_dashboard/landlord_dashboard_screen.dart';
 import 'package:home_rental_application/views/onboarding/onboarding_screen.dart';
 import 'package:home_rental_application/views/profile/profile_screen.dart';
 
 import '../../models/message_model.dart';
+import '../../models/property_model.dart';
 import '../../views/auth/register_screen.dart';
 import '../../views/chat/chat_detail_screen.dart';
 import '../../views/landlord/landlord_bookings/landlord_booking_screen.dart';
@@ -53,7 +55,17 @@ final router = GoRouter(initialLocation: '/', routes: [
       routes: [
         GoRoute(
             path: '/home',
-            builder: (context, state) => const HomeScreen()), // GoRoute
+            builder: (context, state) => const HomeScreen(),
+            routes: [
+              GoRoute(
+                path: 'details',
+                name: 'property-details',
+                builder: (context, state) {
+                  final property = state.extra as Property;
+                  return PropertyDetailsScreen(property: property);
+                },
+              ),
+            ]), // GoRoute
         GoRoute(
             path: '/favorites',
             builder: (context, state) => const FavoritesScreen()), // GoRoute

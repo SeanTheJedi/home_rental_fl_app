@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Property {
   final String id;
   final String title;
@@ -20,6 +22,36 @@ class Property {
     this.bathrooms = 1,
     this.description = '',
   });
+
+  // Convert Firestore Document to Property object
+  factory Property.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Property(
+      id: doc.id,
+      title: data['title'] ?? '',
+      location: data['location'] ?? '',
+      price: (data['price'] ?? 0).toDouble(),
+      averageRating: (data['averageRating'] ?? 0).toDouble(),
+      imageUrl: data['imageUrl'] ?? '',
+      bedrooms: data['bedrooms'] ?? 1,
+      bathrooms: data['bathrooms'] ?? 1,
+      description: data['description'] ?? '',
+    );
+  }
+
+  // Convert Property object to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'location': location,
+      'price': price,
+      'averageRating': averageRating,
+      'imageUrl': imageUrl,
+      'bedrooms': bedrooms,
+      'bathrooms': bathrooms,
+      'description': description,
+    };
+  }
 
   // Dummy data to test the UI before Firebase integration
   static List<Property> dummyProperties = [

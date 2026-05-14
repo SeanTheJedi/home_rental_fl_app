@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:home_rental_application/controllers/property_controller.dart';
 import 'package:home_rental_application/views/home/widgets/home_search_bar.dart';
-import '../../models/property_model.dart';
+import 'package:provider/provider.dart';
 import 'widgets/banner_carousel.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/property_card.dart';
@@ -21,67 +23,109 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            // The top portion of the screen (App Bar, Search, Carousel)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(top: 16.h),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: const HomeAppBar(),
+        child: Consumer<PropertyController>(
+          builder: (context, controller, child) {
+            return CustomScrollView(
+              slivers: [
+                // 1. App Bar, Search, and Banners
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 16.h),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: const HomeAppBar(),
+                        ),
+                        SizedBox(height: 24.h),
+                        const HomeSearchBar(),
+                        SizedBox(height: 24.h),
+                        const BannerCarousel(),
+                        SizedBox(height: 24.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: SectionTitle(
+                            title: 'Popular Properties',
+                            actionText: 'See All',
+                            onActionPressed: () {},
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                      ],
                     ),
-                    SizedBox(height: 24.h),
+                  ),
+                ),
 
-                    const HomeSearchBar(),
-                    SizedBox(height: 24.h),
-
-                    const BannerCarousel(),
-                    SizedBox(height: 24.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: SectionTitle(
-                        title: 'Popular Properties',
-                        actionText: 'See All',
-                        onActionPressed: () {},
+                // 2. Loading State (Shimmer or Progress)
+                if (controller.isLoading)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.primary),
+                    ),
+                  )
+                
+                // 3. Error State
+                else if (controller.error != null)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Text(
+                        'Error: ${controller.error}',
+                        style: TextStyle(color: AppColors.error),
                       ),
                     ),
-                    SizedBox(height: 16.h),
-                  ],
-                ),
-              ),
-            ),
+                  )
 
-            // The Grid of Properties
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                    final property = Property.dummyProperties[index];
-                    return PropertyCard(
-                      property: property,
-                      onTap: () {
-                        // Navigate to Property Details Screen
-                      },
-                    );
-                  },
-                  childCount: Property.dummyProperties.length,
-                ),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16.h,
-                  crossAxisSpacing: 12.w,
-                  childAspectRatio: 0.65, // Adjusts height vs width of cards
-                ),
-              ),
-            ),
+                // 4. Empty State
+                else if (controller.properties.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.home_outlined, size: 64.sp, color: Colors.grey),
+                          SizedBox(height: 16.h),
+                          Text(
+                            'No properties available.',
+                            style: TextStyle(fontSize: 16.sp, color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
 
-            // Bottom padding so the last row isn't hidden behind the nav bar
-            SliverPadding(padding: EdgeInsets.only(bottom: 24.h)),
-          ],
+                // 5. Data State (The Grid)
+                else
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    sliver: SliverGrid(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final property = controller.properties[index];
+                          return PropertyCard(
+                            property: property,
+                            onTap: () {
+                              context.pushNamed('property-details', extra: property);
+                            },
+                          );
+                        },
+                        childCount: controller.properties.length,
+                      ),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 16.h,
+                        crossAxisSpacing: 12.w,
+                        childAspectRatio: 0.65,
+                      ),
+                    ),
+                  ),
+
+                SliverPadding(padding: EdgeInsets.only(bottom: 24.h)),
+              ],
+            );
+          },
         ),
       ),
     );

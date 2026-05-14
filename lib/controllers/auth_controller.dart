@@ -153,7 +153,7 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  String getInitialRoute() {
+   String getInitialRoute() {
     if (_currentUser == null) return '/auth';
     return _currentUser!.role == UserRole.landlord
         ? '/landlord/dashboard'
