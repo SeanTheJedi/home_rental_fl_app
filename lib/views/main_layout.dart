@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:home_rental_application/controllers/auth_controller.dart';
+import 'package:home_rental_application/controllers/property_controller.dart';
 import 'package:home_rental_application/core/common/widgets/bottom_navigation.dart';
+import 'package:provider/provider.dart';
 
 class MainLayout extends StatefulWidget {
   final Widget child;
@@ -23,6 +26,15 @@ class _MainLayoutState extends State<MainLayout> {
   void initState() {
     super.initState();
     _currentIndex = _getIndexFromLocation(widget.location);
+
+    // Initialize favorites for the current user as soon as the layout is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = Provider.of<AuthController>(context, listen: false);
+      if (auth.currentUser != null) {
+        Provider.of<PropertyController>(context, listen: false)
+            .initFavorites(auth.currentUser!.id);
+      }
+    });
   }
 
   @override

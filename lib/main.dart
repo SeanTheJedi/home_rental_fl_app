@@ -19,7 +19,11 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthController()),
-        ChangeNotifierProvider(create: (_) => PropertyController()),
+        ChangeNotifierProxyProvider<AuthController, PropertyController>(
+          create: (_) => PropertyController(),
+          update: (_, auth, property) =>
+              property!..updateUserId(auth.currentUser?.id),
+        ),
       ],
       child: const MyApp(),
     ),

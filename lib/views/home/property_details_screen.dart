@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:home_rental_application/controllers/auth_controller.dart';
+import 'package:home_rental_application/controllers/property_controller.dart';
 import 'package:home_rental_application/core/constants/color_constants.dart';
 import 'package:home_rental_application/models/property_model.dart';
+import 'package:provider/provider.dart';
 
 class PropertyDetailsScreen extends StatelessWidget {
   final Property property;
@@ -11,6 +14,10 @@ class PropertyDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authController = Provider.of<AuthController>(context);
+    final propertyController = Provider.of<PropertyController>(context);
+    final isFav = propertyController.isFavorite(property.id);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Stack(
@@ -38,8 +45,17 @@ class PropertyDetailsScreen extends StatelessWidget {
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
                       child: IconButton(
-                        icon: const Icon(Icons.favorite_border, color: Colors.black),
-                        onPressed: () {},
+                        icon: Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.black,
+                        ),
+                        onPressed: () {
+                          if (authController.currentUser != null) {
+                            propertyController.toggleFavorite(
+                              property.id,
+                            );
+                          }
+                        },
                       ),
                     ),
                   ),
