@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import '../../models/booking_model.dart';
 import '../../models/property_model.dart';
 
 class FirebaseService {
@@ -54,5 +55,38 @@ class FirebaseService {
         .collection('favorites')
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.id).toList());
+  }
+
+  /// Create a new booking
+  Future<void> createBooking(Booking booking) async {
+    try {
+      await _db.collection('bookings').add(booking.toMap());
+    } catch (e) {
+      debugPrint('Error creating booking: $e');
+      rethrow;
+    }
+  }
+
+  /// Get user's bookings
+  Stream<List<Booking>> getUserBookings(String userId) {
+    return _db
+        .collection('bookings')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Booking.fromFirestore(doc)).toList();
+    });
+  }
+
+  /// Update booking status to cancelled
+  Future<void> cancelBooking(String bookingId) async {
+    try {
+      await _db.collection('bookings').doc(bookingId).update({
+        'status': BookingStatus.cancelled.name,
+      });
+    } catch (e) {
+      debugPrint('Error cancelling booking: $e');
+      rethrow;
+    }
   }
 }

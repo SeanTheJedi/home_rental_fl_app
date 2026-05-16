@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:home_rental_application/controllers/booking_controller.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/property_controller.dart';
 import '../../core/common/widgets/page_layout.dart';
@@ -12,13 +13,14 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final propertyController = Provider.of<PropertyController>(context);
-    final favorites = propertyController.favoriteProperties;
-
     return PageLayout(
       title: 'Favorites',
-      body: favorites.isEmpty
-          ? Center(
+      body: Consumer2<PropertyController, BookingController>(
+        builder: (context, propertyController, bookingController, child) {
+          final favorites = propertyController.favoriteProperties;
+
+          if (favorites.isEmpty) {
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -46,28 +48,35 @@ class FavoritesScreen extends StatelessWidget {
                   ),
                 ],
               ),
-            )
-          : Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16.h,
-                  crossAxisSpacing: 16.w,
-                  childAspectRatio: 0.65,
-                ),
-                itemCount: favorites.length,
-                itemBuilder: (context, index) {
-                  final property = favorites[index];
-                  return PropertyCard(
-                    property: property,
-                    onTap: () {
-                      context.pushNamed('property-details', extra: property);
-                    },
-                  );
-                },
+            );
+          }
+
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16.h,
+                crossAxisSpacing: 16.w,
+                childAspectRatio: 0.65,
               ),
+              itemCount: favorites.length,
+              itemBuilder: (context, index) {
+                final property = favorites[index];
+                final isBooked = bookingController.isPropertyBooked(property.id);
+                
+                return PropertyCard(
+                  property: property,
+                  isBooked: isBooked,
+                  onTap: () {
+                    context.pushNamed('property-details', extra: property);
+                  },
+                );
+              },
             ),
+          );
+        },
+      ),
     );
   }
 }

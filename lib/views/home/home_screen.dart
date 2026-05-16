@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:home_rental_application/controllers/booking_controller.dart';
 import 'package:home_rental_application/controllers/property_controller.dart';
 import 'package:home_rental_application/views/home/widgets/home_search_bar.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Consumer<PropertyController>(
-          builder: (context, controller, child) {
+        child: Consumer2<PropertyController, BookingController>(
+          builder: (context, propertyController, bookingController, child) {
             return CustomScrollView(
               slivers: [
                 // 1. App Bar, Search, and Banners
@@ -56,29 +57,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // 2. Loading State (Shimmer or Progress)
-                if (controller.isLoading)
-                  SliverFillRemaining(
+                // 2. Loading State
+                if (propertyController.isLoading)
+                  const SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                      child: CircularProgressIndicator(),
                     ),
                   )
                 
                 // 3. Error State
-                else if (controller.error != null)
+                else if (propertyController.error != null)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
                       child: Text(
-                        'Error: ${controller.error}',
-                        style: TextStyle(color: AppColors.error),
+                        'Error: ${propertyController.error}',
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   )
 
                 // 4. Empty State
-                else if (controller.properties.isEmpty)
+                else if (propertyController.properties.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
@@ -103,15 +104,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     sliver: SliverGrid(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final property = controller.properties[index];
+                          final property = propertyController.properties[index];
+                          // Check if this property is already booked by the user
+                          final isBooked = bookingController.isPropertyBooked(property.id);
+                          
                           return PropertyCard(
                             property: property,
+                            isBooked: isBooked,
                             onTap: () {
                               context.pushNamed('property-details', extra: property);
                             },
                           );
                         },
-                        childCount: controller.properties.length,
+                        childCount: propertyController.properties.length,
                       ),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,

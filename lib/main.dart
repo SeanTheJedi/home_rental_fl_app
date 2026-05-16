@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:home_rental_application/controllers/auth_controller.dart';
+import 'package:home_rental_application/controllers/booking_controller.dart';
 import 'package:home_rental_application/controllers/property_controller.dart';
 import 'package:home_rental_application/core/router/router.dart';
 import 'package:home_rental_application/core/services/storage_service.dart';
@@ -23,6 +24,11 @@ void main() async {
           create: (_) => PropertyController(),
           update: (_, auth, property) =>
               property!..updateUserId(auth.currentUser?.id),
+        ),
+        ChangeNotifierProxyProvider<AuthController, BookingController>(
+          create: (_) => BookingController(),
+          update: (_, auth, booking) =>
+              booking!..updateUserId(auth.currentUser?.id),
         ),
       ],
       child: const MyApp(),

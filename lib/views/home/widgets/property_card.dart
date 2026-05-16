@@ -8,11 +8,13 @@ import '../../../models/property_model.dart';
 class PropertyCard extends StatelessWidget {
   final Property property;
   final VoidCallback onTap;
+  final bool isBooked;
 
   const PropertyCard({
     super.key,
     required this.property,
     required this.onTap,
+    this.isBooked = false,
   });
 
   @override
@@ -35,19 +37,43 @@ class PropertyCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // The Top Image
-            Hero(
-              tag: 'property-image-${property.id}',
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                child: CachedNetworkImage(
-                  imageUrl: property.imageUrl,
-                  height: 120.h,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => _buildShimmerEffect(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+            Stack(
+              children: [
+                Hero(
+                  tag: 'property-image-${property.id}',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+                    child: CachedNetworkImage(
+                      imageUrl: property.imageUrl,
+                      height: 120.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => _buildShimmerEffect(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                    ),
+                  ),
                 ),
-              ),
+                if (isBooked)
+                  Positioned(
+                    top: 8.h,
+                    right: 8.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Text(
+                        'BOOKED',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
 
             // The Bottom Details Data

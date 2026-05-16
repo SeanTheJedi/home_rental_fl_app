@@ -39,6 +39,21 @@ class Property {
     );
   }
 
+  // Convert Map to Property object
+  factory Property.fromMap(Map<String, dynamic> data) {
+    return Property(
+      id: data['id'] ?? '',
+      title: data['title'] ?? '',
+      location: data['location'] ?? '',
+      price: (data['price'] ?? 0).toDouble(),
+      averageRating: (data['averageRating'] ?? 0).toDouble(),
+      imageUrl: data['imageUrl'] ?? '',
+      bedrooms: data['bedrooms'] ?? 1,
+      bathrooms: data['bathrooms'] ?? 1,
+      description: data['description'] ?? '',
+    );
+  }
+
   // Convert Property object to Map for Firestore
   Map<String, dynamic> toMap() {
     return {
